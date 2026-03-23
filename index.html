@@ -6,9 +6,10 @@
 <title>Geoportale Regione Molise</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
 <style>
-*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,sans-serif;background:#f3f4f6;color:#1e293b;line-height:1.5}button{font-family:inherit;cursor:pointer}input{font-family:inherit}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,sans-serif;background:#f3f4f6;color:#1e293b;line-height:1.5}
+button{font-family:inherit;cursor:pointer}input{font-family:inherit}
 .hdr{background:linear-gradient(135deg,#0d2818,#1b4332 40%,#1a3c40);position:sticky;top:0;z-index:2000;box-shadow:0 2px 15px rgba(0,0,0,.25)}
 .hdr-in{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px}
 .logo{display:flex;align-items:center;gap:10px;color:#fff}.logo h1{font-size:15px;font-weight:800}.logo small{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);display:block}
@@ -47,19 +48,21 @@
 <body>
 <header class="hdr"><div class="hdr-in"><div class="logo"><span style="font-size:20px">🏛️</span><div><h1>GEOPORTALE MOLISE</h1><small>Infrastruttura Dati Territoriali</small></div></div>
 <nav class="tabs" id="tabs"><button class="on" onclick="sv('cat')">📋 Catalogo</button><button onclick="sv('map')">🗺️ Mappa</button></nav></div></header>
-<div class="hero" id="hero"><div class="hero-in"><h2>Infrastruttura Dati Territoriali</h2><p>Cerca e consulta dati geospaziali della Regione Molise. Layer WMS ufficiali, confini ISTAT, strade ANAS.</p>
+<div class="hero" id="hero"><div class="hero-in"><h2>Infrastruttura Dati Territoriali</h2><p>Cerca e consulta dati geospaziali della Regione Molise. Layer WMS ufficiali PCN/EEA, confini ISTAT, strade ANAS.</p>
 <div class="sbox"><span class="ic">🔍</span><input id="search" placeholder="Cerca datasets, mappe..." oninput="sT=this.value;render()"></div></div></div>
+
 <div class="wrap" id="catV"><div class="grid"><aside class="aside"><div class="sb"><div class="sb-h">Categorie</div><div class="sb-list" id="cL"></div></div></aside>
 <main><div class="stats" id="sR"></div><div class="rh"><div><span class="t" id="rT">Tutte</span><span class="c" id="rC"></span></div><button class="rb" id="rB" onclick="cC=null;sT='';document.getElementById('search').value='';render()">✕</button></div>
 <div id="fS"></div><div class="cg" id="mG"></div><div class="empty" id="eE" style="display:none"><div class="ic">🔍</div><p>Nessun risultato.</p></div></main></div></div>
+
 <div id="mapV" style="display:none"><div class="map-wrap"><div id="map"></div><div class="map-st" id="mSt">Inizializzazione...</div></div></div>
+
 <div class="mo" id="modal"><div class="mo-bk" onclick="cm()"></div><div class="mo-ct"><div class="mo-hd" id="mH"><button class="mo-x" onclick="cm()">✕</button><div class="emo" id="mE"></div><h2 id="mT"></h2><div class="sub2" id="mS"></div></div><div class="mo-bd"><p class="dsc" id="mD"></p><div class="dg" id="mDt"></div><div class="lic"><span>📋 <b>CC BY 4.0</b> — Riutilizzo con attribuzione</span></div><div class="mo-act" id="mA"></div></div></div></div>
 <div class="toast" id="tE"></div>
-<footer class="ftr"><div class="ftr-in"><p>© 2026 Regione Molise — Fonti: PCN/MASE, ISPRA, ISTAT/OpenPolis, ANAS, Prov. CB/IS</p><p style="opacity:.4">Leaflet + Esri</p></div></footer>
+<footer class="ftr"><div class="ftr-in"><p>© 2026 Regione Molise — Fonti: EEA/Copernicus, PCN/MASE, ISPRA, ISTAT/OpenPolis, ANAS, Prov. CB/IS</p><p style="opacity:.4">Leaflet + WMS HTTPS</p></div></footer>
 
 <script>
 var CATS=[{id:"paesaggio",n:"Piani Paesistici",i:"🏔️",c:"#2d6a4f"},{id:"idrogeologico",n:"Vincolo Idrogeologico",i:"💧",c:"#1d3557"},{id:"natura",n:"Natura 2000 / Parchi",i:"🌿",c:"#588157"},{id:"sismica",n:"Microzonazione Sismica",i:"📊",c:"#e63946"},{id:"idrografia",n:"Idrografia / PAI",i:"🌊",c:"#0077b6"},{id:"vincoli",n:"Vincoli Monumentali",i:"🏛️",c:"#7c3aed"},{id:"strade",n:"Viabilità",i:"🛣️",c:"#6c757d"},{id:"ctr",n:"Cartografia Base",i:"🗺️",c:"#495057"},{id:"geologia",n:"Geologia",i:"⛰️",c:"#774936"},{id:"agricoltura",n:"Uso del Suolo",i:"🌾",c:"#bc6c25"},{id:"protezione",n:"Protezione Civile",i:"🛡️",c:"#d62828"}];
-
 var DS=[
 {id:1,t:"P.T.P.A.A.V. n.1 - Fascia Costiera",cat:"paesaggio",tp:"dataset",fm:"SHP",dt:"2024-03-15",dl:1842,ft:1,d:"PTPAAV n.1 Fascia Costiera Termoli-Campomarino. L.R. 24/1989."},
 {id:2,t:"P.T.P.A.A.V. n.2 - Matese",cat:"paesaggio",tp:"dataset",fm:"SHP",dt:"2024-02-20",dl:1456,d:"PTPAAV n.2 Massiccio del Matese."},
@@ -80,20 +83,17 @@ var DS=[
 {id:17,t:"Strade Provinciali IS",cat:"strade",tp:"dataset",fm:"SHP",dt:"2024-04-10",dl:876,d:"Rete provinciale Isernia."},
 {id:18,t:"CTRN 1:5000",cat:"ctr",tp:"dataset",fm:"TIFF",dt:"2024-01-20",dl:4521,d:"Carta Tecnica Regionale Numerica."},
 {id:19,t:"Carta Geologica CARG",cat:"geologia",tp:"map",fm:"WMS",dt:"2024-03-10",dl:1654,d:"CARG 1:50k ISPRA."},
-{id:20,t:"Corine Land Cover",cat:"agricoltura",tp:"map",fm:"WMS",dt:"2024-04-10",dl:1987,d:"Uso suolo IV livello CLC."},
+{id:20,t:"Corine Land Cover",cat:"agricoltura",tp:"map",fm:"WMS",dt:"2024-04-10",dl:1987,d:"Uso suolo CLC 2018 EEA/Copernicus."},
 {id:21,t:"Reticolo Idrografico",cat:"idrografia",tp:"map",fm:"WMS",dt:"2024-05-20",dl:1654,d:"Reticolo PCN."},
-{id:22,t:"Rischio Incendi",cat:"protezione",tp:"map",fm:"WMS",dt:"2024-06-20",dl:876,d:"Aree percorse dal fuoco."}
+{id:22,t:"Rischio Incendi",cat:"protezione",tp:"map",fm:"WMS",dt:"2024-06-20",dl:876,d:"Rischio incendi boschivi PCN."}
 ];
 
-// STATE
 var cV='cat',cC=null,sT='',mR=false,M=null;
 function gc(id){return CATS.find(function(c){return c.id===id})}
 function fd(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
 function fil(){return DS.filter(function(d){var ms=!sT||d.t.toLowerCase().indexOf(sT.toLowerCase())>=0||d.d.toLowerCase().indexOf(sT.toLowerCase())>=0;return ms&&(!cC||d.cat===cC)})}
 var ti;function toast(m){var e=document.getElementById('tE');e.textContent=m;e.classList.add('show');clearTimeout(ti);ti=setTimeout(function(){e.classList.remove('show')},3000)}
 function dlG(id){var d=DS.find(function(x){return x.id===id});if(!d)return;var g={type:"FeatureCollection",name:d.t,features:[{type:"Feature",properties:{name:d.t,desc:d.d,license:"CC-BY 4.0"},geometry:{type:"Point",coordinates:[14.66,41.56]}}]};var b=new Blob([JSON.stringify(g,null,2)],{type:'application/json'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download=d.t.replace(/[^a-zA-Z0-9]/g,'_')+'.geojson';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);toast('✅ Scaricato')}
-
-// RENDER
 function rc(d){var c=gc(d.cat);return '<div class="dc" onclick="om('+d.id+')">'+(d.ft?'<div class="ft">⭐</div>':'')+'<div class="cl"><span>'+c.i+'</span><span style="color:'+c.c+'">'+c.n+'</span></div><h3>'+d.t+'</h3><p class="ds">'+d.d+'</p><div class="mt"><span class="bdg bdg-'+d.fm.toLowerCase()+'">'+d.fm+'</span><span class="mi">📅 '+fd(d.dt)+'</span><span class="mi">⬇'+d.dl.toLocaleString()+'</span></div></div>'}
 function render(){
 var f=fil(),cn={};DS.forEach(function(d){cn[d.cat]=(cn[d.cat]||0)+1});
@@ -114,7 +114,7 @@ function cm(){document.getElementById('modal').classList.remove('open');document
 document.addEventListener('keydown',function(e){if(e.key==='Escape')cm()});
 
 // ═══════════════════════════════════════════
-// MAP
+// MAP — ALL WMS via HTTPS + <img> tags (NO CORS!)
 // ═══════════════════════════════════════════
 function initMap(){
 mR=true;
@@ -126,62 +126,59 @@ var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attrib
 var topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{attribution:'© OpenTopoMap',maxZoom:17});
 var sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:18});
 var bases={"OpenStreetMap":osm,"Topografica":topo,"Satellite":sat};
-var ov={};
 var LC=L.control.layers(bases,{},{collapsed:true}).addTo(M);
 
-// ─── ESRI/ARCGIS LAYERS (HTTPS!) from PCN ───
-// These use the ArcGIS REST API which supports HTTPS
-var PCN_ARC="https://www.pcn.minambiente.it/arcgis/rest/services/";
-
-try {
-  // Progetto Natura: Natura 2000 + EUAP (layers 0-6)
-  var natura=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/progetto_natura/MapServer",opacity:0.55,layers:[0,1,2,3,4]});
-  LC.addOverlay(natura,"🌿🏔️ Natura 2000 + Aree Protette");
-
-  // Vincoli (if available)
-  var vincoli=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/Vincoli/MapServer",opacity:0.5});
-  LC.addOverlay(vincoli,"🏛️ Vincoli Paesaggistici");
-
-  // Pericolosità PAI
-  var pai=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/PAI/MapServer",opacity:0.5});
-  LC.addOverlay(pai,"💧 PAI Pericolosità/Rischio");
-
-  // Classificazione sismica
-  var sism=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/Classificazione_sismica/MapServer",opacity:0.45});
-  LC.addOverlay(sism,"📊 Classificazione Sismica");
-
-  // Corine Land Cover
-  var clc=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/CLC/MapServer",opacity:0.4});
-  LC.addOverlay(clc,"🌾 Corine Land Cover");
-
-  st.textContent='✅ Layer ArcGIS PCN disponibili';
-} catch(e) {
-  st.textContent='⚠️ Layer PCN non disponibili: '+e.message;
+// WMS helper — loads as <img> src, NO CORS needed
+function wms(url,layers,opts){
+  return L.tileLayer.wms(url,Object.assign({format:'image/png',transparent:true,version:'1.1.1',opacity:0.55},opts||{},{layers:layers}));
 }
 
-// ─── ISPRA IFFI (ArcGIS HTTPS) ───
-try {
-  var iffi=L.esri.dynamicMapLayer({url:"https://www.geoservices.isprambiente.it/arcgis/rest/services/IFFI/Progetto_IFFI_WMS_public/MapServer",opacity:0.55});
-  LC.addOverlay(iffi,"🏚️ IFFI Frane (ISPRA)");
-} catch(e){}
+// ─── EEA DISCOMAP (HTTPS, CORS enabled) ───
+// Natura 2000 SIC/ZPS
+LC.addOverlay(
+  wms('https://bio.discomap.eea.europa.eu/arcgis/services/ProtectedSites/Natura2000_Dyna_WM/MapServer/WMSServer','2,4',{opacity:0.5}),
+  "🌿 Natura 2000 SIC/ZPS (EEA)"
+);
+// Aree Protette EUAP
+LC.addOverlay(
+  wms('https://bio.discomap.eea.europa.eu/arcgis/services/ProtectedSites/EUNIS_Website_Dyna_WM/MapServer/WMSServer','0,1,2,3,4',{opacity:0.45}),
+  "🏔️ Aree Protette / EUAP (EEA)"
+);
+// Corine Land Cover 2018
+LC.addOverlay(
+  wms('https://image.discomap.eea.europa.eu/arcgis/services/Corine/CLC2018_WM/MapServer/WMSServer','0',{opacity:0.4}),
+  "🌾 Corine Land Cover 2018"
+);
 
-// ─── ISPRA Geologia (ArcGIS HTTPS) ───
-try {
-  var geo100=L.esri.dynamicMapLayer({url:"https://sgi2.isprambiente.it/arcgis/rest/services/servizi/carta_geologica100k/MapServer",opacity:0.45});
-  LC.addOverlay(geo100,"⛰️ Geologia 1:100k (ISPRA)");
-  var geo50=L.esri.dynamicMapLayer({url:"https://sgi2.isprambiente.it/arcgis/rest/services/servizi/carta_geologica50k/MapServer",opacity:0.45});
-  LC.addOverlay(geo50,"⛰️ Geologia CARG 1:50k");
-} catch(e){}
+// ─── PCN/MASE ArcGIS WMSServer (HTTPS + <img> tag = bypasses CORS) ───
+var P='https://www.pcn.minambiente.it/arcgis/services/';
 
-// ─── WMS FALLBACK (HTTP — funziona solo da server locale) ───
-var P="http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/Vettoriali/";
-function w(u,l,o){return L.tileLayer.wms(u,Object.assign({format:'image/png',transparent:true,version:'1.1.1'},o||{},{layers:l}))}
-LC.addOverlay(w(P+"Reticolo_idrografico.map","Reticolo_idrografico",{opacity:.5}),"🌊 Reticolo Idrografico (HTTP)");
-LC.addOverlay(w(P+"Grafo_stradale.map","Grafo_stradale",{opacity:.5}),"🛣️ Grafo Stradale (HTTP)");
-LC.addOverlay(w(P+"Aree_percorse_dal_fuoco.map","Aree_percorse_dal_fuoco",{opacity:.5}),"🔥 Incendi (HTTP)");
-LC.addOverlay(w("http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/ortofoto_colore_12.map","OI.ORTOIMMAGINI.2012",{opacity:.75}),"📷 Ortofoto 2012 (HTTP)");
+// Vincoli Paesaggistici SITAP
+LC.addOverlay(wms(P+'progetti/Vincoli/MapServer/WMSServer','0,1,2',{opacity:0.5}),"🏛️ Vincoli SITAP");
+// PAI Pericolosità
+LC.addOverlay(wms(P+'progetti/PAI/MapServer/WMSServer','0,1,2',{opacity:0.5}),"💧 PAI Pericolosità/Rischio");
+// Classificazione Sismica
+LC.addOverlay(wms(P+'progetti/Classificazione_sismica/MapServer/WMSServer','0',{opacity:0.45}),"📊 Classificazione Sismica");
+// Alluvioni
+LC.addOverlay(wms(P+'Alluvioni_Estensione/MapServer/WMSServer','0,1,2',{opacity:0.45}),"🌊 Alluvioni Dir. 2007/60/CE");
+// Catalogo Frane
+LC.addOverlay(wms(P+'Catalogo_Frane_Aree/MapServer/WMSServer','0',{opacity:0.5}),"🏚️ Catalogo Frane");
+// Incendi
+LC.addOverlay(wms(P+'AIB_rischio_incendi_globale/MapServer/WMSServer','0',{opacity:0.45}),"🔥 Rischio Incendi");
+// Aree Ramsar
+LC.addOverlay(wms(P+'aree_ramsar/MapServer/WMSServer','0',{opacity:0.5}),"🦆 Aree Ramsar");
 
-// ─── GEOJSON COMUNI da jsDelivr CDN (HTTPS + CORS) ───
+// ─── ISPRA WMSServer (HTTPS + <img> tag) ───
+LC.addOverlay(
+  wms('https://sgi2.isprambiente.it/arcgis/services/servizi/carta_geologica100k/MapServer/WMSServer','0',{opacity:0.45}),
+  "⛰️ Geologia 1:100k (ISPRA)"
+);
+LC.addOverlay(
+  wms('https://sgi2.isprambiente.it/arcgis/services/servizi/carta_geologica50k/MapServer/WMSServer','0',{opacity:0.45}),
+  "⛰️ Geologia CARG 1:50k"
+);
+
+// ─── GEOJSON COMUNI ISTAT (jsDelivr CDN HTTPS) ───
 st.textContent='⏳ Caricamento 136 comuni ISTAT...';
 fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/geojson/limits_R_14_municipalities.geojson")
 .then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
@@ -196,15 +193,15 @@ fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/geojson/limits
   }).addTo(M);
   LC.addOverlay(ly,"🏘️ Comuni ISTAT ("+data.features.length+")");
   M.fitBounds(ly.getBounds(),{padding:[20,20]});
-  st.textContent='✅ '+data.features.length+' comuni + layer ArcGIS caricati';
-  toast('✅ 136 comuni caricati — attiva layer dal pannello ☰');
+  st.textContent='✅ '+data.features.length+' comuni + WMS HTTPS caricati';
+  toast('✅ '+data.features.length+' comuni caricati — attiva layer WMS dal pannello ☰');
 }).catch(function(e){st.textContent='⚠️ Comuni non caricati: '+e.message});
 
 // Province
 fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/geojson/limits_IT_provinces.geojson")
 .then(function(r){return r.json()}).then(function(d){
   var prov=d.features.filter(function(f){return f.properties.prov_name==='Campobasso'||f.properties.prov_name==='Isernia'});
-  if(prov.length){var ly=L.geoJSON({type:"FeatureCollection",features:prov},{style:{color:'#1d3557',weight:2,fillOpacity:.02,dashArray:'6,3'},onEachFeature:function(f,l){l.bindPopup('<b>Prov. '+f.properties.prov_name+'</b>')}}).addTo(M);LC.addOverlay(ly,"📍 Province")}
+  if(prov.length){var ly=L.geoJSON({type:"FeatureCollection",features:prov},{style:{color:'#1d3557',weight:2.5,fillOpacity:.02,dashArray:'6,3'},onEachFeature:function(f,l){l.bindPopup('<b>Prov. '+f.properties.prov_name+'</b>')}}).addTo(M);LC.addOverlay(ly,"📍 Province CB/IS")}
 }).catch(function(){});
 
 // Regione
@@ -230,9 +227,9 @@ var anas=[
 var aG=L.layerGroup();
 anas.forEach(function(s){var ln=L.polyline(s.p,{color:s.c,weight:s.w,opacity:.85});ln.bindPopup('<b>'+s.id+'</b> '+s.n+'<br><i>'+s.d+'</i><br>ANAS km'+s.ki+'→'+s.kf);ln.addTo(aG);
 [[0,s.ki],[s.p.length-1,s.kf]].forEach(function(x){L.marker(s.p[x[0]],{icon:L.divIcon({html:'<div style="background:#d32f2f;color:#fff;font-size:7px;font-weight:700;padding:1px 3px;border-radius:2px;white-space:nowrap;border:1px solid #fff">'+s.id+' km'+x[1]+'</div>',className:'',iconAnchor:[16,-3]})}).addTo(aG)})});
-aG.addTo(M);LC.addOverlay(aG,"🛣️ ANAS Statali");
+aG.addTo(M);LC.addOverlay(aG,"🛣️ ANAS Statali (10)");
 
-// ─── STRADE PROVINCIALI ───
+// Provinciali
 var sp=[
 {id:"SP51",n:"Sinarca",e:"Prov.CB",g:"Gr.8",p:[[41.95,14.90],[41.97,14.93],[42.00,14.96]]},
 {id:"SP78",n:"Larino-Montorio",e:"Prov.CB",g:"Gr.8",p:[[41.80,14.92],[41.78,14.88],[41.75,14.85]]},
@@ -250,7 +247,7 @@ var sp=[
 {id:"SP72",n:"Isernia-Pesche",e:"Prov.IS",p:[[41.60,14.23],[41.61,14.26],[41.62,14.28]]}
 ];
 var sG=L.layerGroup();sp.forEach(function(s){var c=s.e.indexOf('IS')>=0?'#0d47a1':'#1565c0';L.polyline(s.p,{color:c,weight:2.5,opacity:.7,dashArray:'8,4'}).bindPopup('<b>'+s.id+'</b> '+s.n+'<br>'+s.e+(s.g?' ('+s.g+')':'')).addTo(sG)});
-LC.addOverlay(sG,"🛤️ Provinciali CB/IS");
+LC.addOverlay(sG,"🛤️ Provinciali CB/IS (14)");
 
 // Centri
 var ct=[{n:"Campobasso",la:41.5603,lo:14.6627,m:1},{n:"Isernia",la:41.5961,lo:14.2328,m:1},{n:"Termoli",la:42.0025,lo:14.9942},{n:"Bojano",la:41.4833,lo:14.4667},{n:"Larino",la:41.80,lo:14.917},{n:"Venafro",la:41.4833,lo:14.05},{n:"Agnone",la:41.817,lo:14.367},{n:"Trivento",la:41.783,lo:14.55}];
