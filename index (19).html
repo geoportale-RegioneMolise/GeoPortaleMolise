@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Geoportale Regione Molise</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}body{font-family:system-ui,sans-serif;background:#f3f4f6;color:#1e293b;line-height:1.5}button{font-family:inherit;cursor:pointer}input{font-family:inherit}
+.hdr{background:linear-gradient(135deg,#0d2818,#1b4332 40%,#1a3c40);position:sticky;top:0;z-index:2000;box-shadow:0 2px 15px rgba(0,0,0,.25)}
+.hdr-in{max-width:1400px;margin:0 auto;padding:0 20px;display:flex;align-items:center;justify-content:space-between;height:56px}
+.logo{display:flex;align-items:center;gap:10px;color:#fff}.logo h1{font-size:15px;font-weight:800}.logo small{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.6);display:block}
+.tabs{display:flex;gap:2px}.tabs button{padding:7px 14px;border:none;border-radius:6px;background:0;color:rgba(255,255,255,.6);font-size:12.5px;font-weight:500;transition:.2s}.tabs button:hover{background:rgba(255,255,255,.1);color:#fff}.tabs button.on{background:rgba(255,255,255,.18);color:#fff;font-weight:700}
+.hero{background:linear-gradient(135deg,#1b4332,#2d6a4f 50%,#40916c);padding:28px 20px 24px;color:#fff}.hero-in{max-width:1400px;margin:0 auto}
+.hero h2{font-size:22px;font-weight:800;margin-bottom:5px}.hero p{font-size:13px;opacity:.85;max-width:520px;line-height:1.5;margin-bottom:14px}
+.sbox{position:relative;max-width:480px}.sbox input{width:100%;padding:11px 14px 11px 38px;border-radius:8px;border:2px solid rgba(255,255,255,.25);background:rgba(255,255,255,.12);color:#fff;font-size:14px;outline:none}.sbox input::placeholder{color:rgba(255,255,255,.5)}.sbox .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:14px;opacity:.6}
+.wrap{max-width:1400px;margin:0 auto;padding:16px 20px 40px}.grid{display:grid;grid-template-columns:220px 1fr;gap:16px}
+.sb{background:#fff;border-radius:8px;border:1px solid #e5e7eb;overflow:hidden;margin-bottom:12px}.sb-h{padding:10px 14px;border-bottom:1px solid #f0f0f3;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:#475569}.sb-list{padding:3px}
+.cb{width:100%;text-align:left;padding:7px 10px;border:none;border-radius:5px;background:0;color:#475569;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:space-between;transition:.15s}.cb:hover{background:#f8fafc}.cb.on{background:#f0fdf4;color:#166534;font-weight:700}.cb .lbl{display:flex;align-items:center;gap:5px}.cb .cnt{font-size:9px;font-weight:700;border-radius:8px;padding:1px 6px;background:#e5e7eb;color:#6b7280}.cb.on .cnt{background:#2d6a4f;color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}.stc{background:#fff;border-radius:8px;padding:12px 14px;border:1px solid #e5e7eb}.stc .si{font-size:18px}.stc .sv{font-size:18px;font-weight:800;margin:2px 0 1px}.stc .sl{font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.rh .t{font-size:13px;font-weight:700}.rh .c{font-size:11px;color:#94a3b8;margin-left:5px}.rh .rb{padding:3px 10px;border-radius:5px;border:1px solid #e2e8f0;background:#fff;font-size:10px;color:#64748b;display:none}
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;margin-bottom:18px}
+.dc{background:#fff;border-radius:8px;padding:16px 18px;cursor:pointer;border:1px solid #e5e7eb;position:relative;overflow:hidden;transition:.2s}.dc:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(0,0,0,.06)}
+.dc .ft{position:absolute;top:0;right:0;background:#e63946;color:#fff;font-size:8px;font-weight:700;padding:2px 8px;border-radius:0 0 0 5px}
+.dc .cl{display:flex;align-items:center;gap:5px;margin-bottom:6px}.dc .cl span:first-child{font-size:14px}.dc .cl span:last-child{font-size:10.5px;font-weight:600}
+.dc h3{font-size:13px;font-weight:700;color:#0f172a;line-height:1.3;margin-bottom:5px}.dc .ds{font-size:11.5px;color:#64748b;line-height:1.45;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:8px}
+.dc .mt{display:flex;align-items:center;gap:6px;flex-wrap:wrap}.bdg{display:inline-block;padding:1px 7px;border-radius:3px;color:#fff;font-size:9px;font-weight:700;text-transform:uppercase}.bdg-shp{background:#2d6a4f}.bdg-wms{background:#0077b6}.bdg-tiff{background:#774936}.mi{font-size:9.5px;color:#94a3b8}
+.mo{position:fixed;inset:0;z-index:3000;display:none;align-items:center;justify-content:center}.mo.open{display:flex}.mo-bk{position:absolute;inset:0;background:rgba(0,0,0,.5);backdrop-filter:blur(4px)}
+.mo-ct{position:relative;background:#fff;border-radius:12px;max-width:560px;width:92%;max-height:85vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.2);animation:moIn .2s}@keyframes moIn{from{transform:scale(.96);opacity:0}to{transform:none;opacity:1}}
+.mo-hd{padding:22px 24px 16px;border-radius:12px 12px 0 0;position:relative}.mo-x{position:absolute;top:10px;right:14px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.2);border:none;color:#fff;font-size:13px;display:flex;align-items:center;justify-content:center}
+.mo-hd .emo{font-size:24px}.mo-hd h2{color:#fff;font-size:17px;font-weight:700;margin:5px 0 3px;padding-right:32px}.mo-hd .sub2{color:rgba(255,255,255,.75);font-size:11px}
+.mo-bd{padding:18px 24px 24px}.mo-bd .dsc{font-size:12.5px;color:#475569;line-height:1.6;margin-bottom:16px}
+.dg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}.di{background:#f8fafc;border-radius:5px;padding:9px 12px}.di .l{font-size:9px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px}.di .v{font-size:12px;color:#1e293b;font-weight:600}
+.lic{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:5px;padding:9px 12px;margin-bottom:14px}.lic span{font-size:10.5px;color:#166534}
+.mo-act{display:flex;gap:7px;flex-wrap:wrap}.mo-act .bp{flex:1;padding:10px 14px;color:#fff;border:none;border-radius:5px;font-weight:700;font-size:11.5px;min-width:100px}.mo-act .bs{flex:1;padding:10px 14px;background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;border-radius:5px;font-weight:600;font-size:11.5px;min-width:100px}
+.map-wrap{height:calc(100vh - 56px);position:relative}#map{width:100%;height:100%}
+.map-st{position:absolute;bottom:8px;left:8px;z-index:1000;background:rgba(255,255,255,.92);border-radius:6px;padding:5px 10px;font-size:10px;color:#475569;box-shadow:0 1px 6px rgba(0,0,0,.1)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%) translateY(70px);background:#1e293b;color:#fff;padding:8px 20px;border-radius:7px;font-size:12px;font-weight:600;z-index:5000;box-shadow:0 6px 24px rgba(0,0,0,.3);transition:transform .3s;pointer-events:none}.toast.show{transform:translateX(-50%) translateY(0)}
+.ftr{background:#0f172a;color:rgba(255,255,255,.55);padding:24px 20px}.ftr-in{max-width:1400px;margin:0 auto;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}.ftr p{font-size:10px}
+.empty{text-align:center;padding:40px 16px;color:#94a3b8}.empty .ic{font-size:36px;margin-bottom:8px}
+.leaflet-control-layers{max-height:calc(100vh - 80px)!important;overflow-y:auto!important;font-size:11px!important;border-radius:8px!important}
+@media(max-width:768px){.grid{grid-template-columns:1fr}.aside{display:none}.stats{grid-template-columns:repeat(2,1fr)}.hero h2{font-size:18px}}
+</style>
+</head>
+<body>
+<header class="hdr"><div class="hdr-in"><div class="logo"><span style="font-size:20px">🏛️</span><div><h1>GEOPORTALE MOLISE</h1><small>Infrastruttura Dati Territoriali</small></div></div>
+<nav class="tabs" id="tabs"><button class="on" onclick="sv('cat')">📋 Catalogo</button><button onclick="sv('map')">🗺️ Mappa</button></nav></div></header>
+<div class="hero" id="hero"><div class="hero-in"><h2>Infrastruttura Dati Territoriali</h2><p>Cerca e consulta dati geospaziali della Regione Molise. Layer WMS ufficiali, confini ISTAT, strade ANAS.</p>
+<div class="sbox"><span class="ic">🔍</span><input id="search" placeholder="Cerca datasets, mappe..." oninput="sT=this.value;render()"></div></div></div>
+<div class="wrap" id="catV"><div class="grid"><aside class="aside"><div class="sb"><div class="sb-h">Categorie</div><div class="sb-list" id="cL"></div></div></aside>
+<main><div class="stats" id="sR"></div><div class="rh"><div><span class="t" id="rT">Tutte</span><span class="c" id="rC"></span></div><button class="rb" id="rB" onclick="cC=null;sT='';document.getElementById('search').value='';render()">✕</button></div>
+<div id="fS"></div><div class="cg" id="mG"></div><div class="empty" id="eE" style="display:none"><div class="ic">🔍</div><p>Nessun risultato.</p></div></main></div></div>
+<div id="mapV" style="display:none"><div class="map-wrap"><div id="map"></div><div class="map-st" id="mSt">Inizializzazione...</div></div></div>
+<div class="mo" id="modal"><div class="mo-bk" onclick="cm()"></div><div class="mo-ct"><div class="mo-hd" id="mH"><button class="mo-x" onclick="cm()">✕</button><div class="emo" id="mE"></div><h2 id="mT"></h2><div class="sub2" id="mS"></div></div><div class="mo-bd"><p class="dsc" id="mD"></p><div class="dg" id="mDt"></div><div class="lic"><span>📋 <b>CC BY 4.0</b> — Riutilizzo con attribuzione</span></div><div class="mo-act" id="mA"></div></div></div></div>
+<div class="toast" id="tE"></div>
+<footer class="ftr"><div class="ftr-in"><p>© 2026 Regione Molise — Fonti: PCN/MASE, ISPRA, ISTAT/OpenPolis, ANAS, Prov. CB/IS</p><p style="opacity:.4">Leaflet + Esri</p></div></footer>
+
+<script>
+var CATS=[{id:"paesaggio",n:"Piani Paesistici",i:"🏔️",c:"#2d6a4f"},{id:"idrogeologico",n:"Vincolo Idrogeologico",i:"💧",c:"#1d3557"},{id:"natura",n:"Natura 2000 / Parchi",i:"🌿",c:"#588157"},{id:"sismica",n:"Microzonazione Sismica",i:"📊",c:"#e63946"},{id:"idrografia",n:"Idrografia / PAI",i:"🌊",c:"#0077b6"},{id:"vincoli",n:"Vincoli Monumentali",i:"🏛️",c:"#7c3aed"},{id:"strade",n:"Viabilità",i:"🛣️",c:"#6c757d"},{id:"ctr",n:"Cartografia Base",i:"🗺️",c:"#495057"},{id:"geologia",n:"Geologia",i:"⛰️",c:"#774936"},{id:"agricoltura",n:"Uso del Suolo",i:"🌾",c:"#bc6c25"},{id:"protezione",n:"Protezione Civile",i:"🛡️",c:"#d62828"}];
+
+var DS=[
+{id:1,t:"P.T.P.A.A.V. n.1 - Fascia Costiera",cat:"paesaggio",tp:"dataset",fm:"SHP",dt:"2024-03-15",dl:1842,ft:1,d:"PTPAAV n.1 Fascia Costiera Termoli-Campomarino. L.R. 24/1989."},
+{id:2,t:"P.T.P.A.A.V. n.2 - Matese",cat:"paesaggio",tp:"dataset",fm:"SHP",dt:"2024-02-20",dl:1456,d:"PTPAAV n.2 Massiccio del Matese."},
+{id:3,t:"P.T.P.A.A.V. n.7 - Mainarde",cat:"paesaggio",tp:"dataset",fm:"SHP",dt:"2023-12-05",dl:1123,ft:1,d:"PTPAAV n.7 Mainarde e Alto Volturno."},
+{id:4,t:"Carta Trasformabilità",cat:"paesaggio",tp:"map",fm:"WMS",dt:"2024-09-10",dl:2100,d:"Tavola P1 Trasformabilità PTPAAV."},
+{id:5,t:"Vincolo Idrogeologico CB",cat:"idrogeologico",tp:"dataset",fm:"SHP",dt:"2024-05-01",dl:2341,ft:1,d:"Vincolo idrogeologico Campobasso R.D. 3267/1923."},
+{id:6,t:"Vincolo Idrogeologico IS",cat:"idrogeologico",tp:"dataset",fm:"SHP",dt:"2024-04-22",dl:1876,d:"Vincolo idrogeologico Isernia."},
+{id:7,t:"IFFI Fenomeni Franosi",cat:"idrogeologico",tp:"dataset",fm:"SHP",dt:"2024-06-10",dl:3102,ft:1,d:"Inventario IFFI frane ISPRA."},
+{id:8,t:"PAI Assetto Idrogeologico",cat:"idrografia",tp:"dataset",fm:"SHP",dt:"2024-03-28",dl:2567,d:"Pericolosità e rischio PAI."},
+{id:9,t:"SIC Natura 2000",cat:"natura",tp:"dataset",fm:"SHP",dt:"2024-07-15",dl:1654,d:"Siti Interesse Comunitario."},
+{id:10,t:"ZPS Natura 2000",cat:"natura",tp:"dataset",fm:"SHP",dt:"2024-07-15",dl:1432,d:"Zone Protezione Speciale."},
+{id:11,t:"Aree Protette EUAP",cat:"natura",tp:"map",fm:"WMS",dt:"2024-07-20",dl:1234,ft:1,d:"PN Abruzzo Lazio Molise, Riserve, Parco Matese."},
+{id:12,t:"Microzonazione Sismica L.1",cat:"sismica",tp:"dataset",fm:"SHP",dt:"2024-08-01",dl:2876,ft:1,d:"MS Livello 1 comuni zona sismica."},
+{id:13,t:"Classificazione Sismica",cat:"sismica",tp:"map",fm:"WMS",dt:"2024-06-01",dl:2134,d:"136 comuni classificazione sismica."},
+{id:14,t:"Vincoli Paesaggistici SITAP",cat:"vincoli",tp:"map",fm:"WMS",dt:"2024-06-01",dl:2456,ft:1,d:"Vincoli D.Lgs 42/2004 Sovrintendenza ABAP."},
+{id:15,t:"Strade Statali ANAS",cat:"strade",tp:"dataset",fm:"SHP",dt:"2024-04-01",dl:1654,ft:1,d:"SS17, SS87, SS647, SS650, SS85, SS158, SS652, SS711, SS751, SS747."},
+{id:16,t:"Strade Provinciali CB",cat:"strade",tp:"dataset",fm:"SHP",dt:"2024-04-10",dl:987,d:"Rete provinciale Campobasso 8 gruppi manut."},
+{id:17,t:"Strade Provinciali IS",cat:"strade",tp:"dataset",fm:"SHP",dt:"2024-04-10",dl:876,d:"Rete provinciale Isernia."},
+{id:18,t:"CTRN 1:5000",cat:"ctr",tp:"dataset",fm:"TIFF",dt:"2024-01-20",dl:4521,d:"Carta Tecnica Regionale Numerica."},
+{id:19,t:"Carta Geologica CARG",cat:"geologia",tp:"map",fm:"WMS",dt:"2024-03-10",dl:1654,d:"CARG 1:50k ISPRA."},
+{id:20,t:"Corine Land Cover",cat:"agricoltura",tp:"map",fm:"WMS",dt:"2024-04-10",dl:1987,d:"Uso suolo IV livello CLC."},
+{id:21,t:"Reticolo Idrografico",cat:"idrografia",tp:"map",fm:"WMS",dt:"2024-05-20",dl:1654,d:"Reticolo PCN."},
+{id:22,t:"Rischio Incendi",cat:"protezione",tp:"map",fm:"WMS",dt:"2024-06-20",dl:876,d:"Aree percorse dal fuoco."}
+];
+
+// STATE
+var cV='cat',cC=null,sT='',mR=false,M=null;
+function gc(id){return CATS.find(function(c){return c.id===id})}
+function fd(d){var p=d.split('-');return p[2]+'/'+p[1]+'/'+p[0]}
+function fil(){return DS.filter(function(d){var ms=!sT||d.t.toLowerCase().indexOf(sT.toLowerCase())>=0||d.d.toLowerCase().indexOf(sT.toLowerCase())>=0;return ms&&(!cC||d.cat===cC)})}
+var ti;function toast(m){var e=document.getElementById('tE');e.textContent=m;e.classList.add('show');clearTimeout(ti);ti=setTimeout(function(){e.classList.remove('show')},3000)}
+function dlG(id){var d=DS.find(function(x){return x.id===id});if(!d)return;var g={type:"FeatureCollection",name:d.t,features:[{type:"Feature",properties:{name:d.t,desc:d.d,license:"CC-BY 4.0"},geometry:{type:"Point",coordinates:[14.66,41.56]}}]};var b=new Blob([JSON.stringify(g,null,2)],{type:'application/json'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download=d.t.replace(/[^a-zA-Z0-9]/g,'_')+'.geojson';document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(u);toast('✅ Scaricato')}
+
+// RENDER
+function rc(d){var c=gc(d.cat);return '<div class="dc" onclick="om('+d.id+')">'+(d.ft?'<div class="ft">⭐</div>':'')+'<div class="cl"><span>'+c.i+'</span><span style="color:'+c.c+'">'+c.n+'</span></div><h3>'+d.t+'</h3><p class="ds">'+d.d+'</p><div class="mt"><span class="bdg bdg-'+d.fm.toLowerCase()+'">'+d.fm+'</span><span class="mi">📅 '+fd(d.dt)+'</span><span class="mi">⬇'+d.dl.toLocaleString()+'</span></div></div>'}
+function render(){
+var f=fil(),cn={};DS.forEach(function(d){cn[d.cat]=(cn[d.cat]||0)+1});
+var h='<button class="cb'+(cC?'':' on')+'" onclick="cC=null;render()"><span class="lbl">📋 Tutte</span><span class="cnt">'+DS.length+'</span></button>';
+CATS.forEach(function(c){var n=cn[c.id]||0;if(!n)return;h+='<button class="cb'+(cC===c.id?' on':'')+'" onclick="cC=\''+c.id+'\';render()"><span class="lbl">'+c.i+' '+c.n+'</span><span class="cnt">'+n+'</span></button>'});
+document.getElementById('cL').innerHTML=h;
+var ds=f.filter(function(d){return d.tp==='dataset'}).length,mp=f.filter(function(d){return d.tp==='map'}).length,td=f.reduce(function(s,d){return s+d.dl},0);
+document.getElementById('sR').innerHTML=[{l:'Datasets',v:ds,i:'📦',c:'#2d6a4f'},{l:'Mappe',v:mp,i:'🗺️',c:'#0077b6'},{l:'Totale',v:f.length,i:'📋',c:'#334155'},{l:'Downloads',v:td.toLocaleString(),i:'⬇',c:'#d62828'}].map(function(s){return '<div class="stc"><div class="si">'+s.i+'</div><div class="sv" style="color:'+s.c+'">'+s.v+'</div><div class="sl">'+s.l+'</div></div>'}).join('');
+document.getElementById('rT').textContent=cC?gc(cC).n:'Tutte le risorse';document.getElementById('rC').textContent='('+f.length+')';document.getElementById('rB').style.display=cC?'block':'none';
+var fs=document.getElementById('fS');if(!cC&&!sT){var ft=DS.filter(function(d){return d.ft}).slice(0,4);fs.innerHTML=ft.length?'<div style="font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px">⭐ In Evidenza</div><div class="cg">'+ft.map(rc).join('')+'</div>':''}else fs.innerHTML='';
+document.getElementById('mG').innerHTML=f.map(rc).join('');document.getElementById('eE').style.display=f.length?'none':'block';document.getElementById('hero').style.display=(cV==='cat'&&!cC&&!sT)?'block':'none'}
+function sv(v){cV=v;document.getElementById('catV').style.display=v==='cat'?'block':'none';document.getElementById('mapV').style.display=v==='map'?'block':'none';document.getElementById('hero').style.display=(v==='cat'&&!cC&&!sT)?'block':'none';document.querySelectorAll('#tabs button').forEach(function(b,i){b.classList.toggle('on',i===(v==='cat'?0:1))});if(v==='map'&&!mR)initMap();if(v==='map'&&M)setTimeout(function(){M.invalidateSize()},100)}
+function om(id){var d=DS.find(function(x){return x.id===id});if(!d)return;var c=gc(d.cat);document.getElementById('mH').style.background='linear-gradient(135deg,'+c.c+'ee,'+c.c+'88)';document.getElementById('mE').textContent=c.i;document.getElementById('mT').textContent=d.t;document.getElementById('mS').textContent=c.n;document.getElementById('mD').textContent=d.d;
+document.getElementById('mDt').innerHTML=[['Formato',d.fm],['Tipo',d.tp==='dataset'?'Dataset':'Mappa WMS'],['Data',fd(d.dt)],['Downloads',d.dl.toLocaleString()]].map(function(x){return '<div class="di"><div class="l">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>'}).join('');
+document.getElementById('mA').innerHTML='<button class="bp" style="background:'+c.c+'" onclick="dlG('+d.id+')">⬇ Scarica</button><button class="bs" onclick="sv(\'map\');cm()">🗺️ Mappa</button>';
+document.getElementById('modal').classList.add('open');document.body.style.overflow='hidden'}
+function cm(){document.getElementById('modal').classList.remove('open');document.body.style.overflow=''}
+document.addEventListener('keydown',function(e){if(e.key==='Escape')cm()});
+
+// ═══════════════════════════════════════════
+// MAP
+// ═══════════════════════════════════════════
+function initMap(){
+mR=true;
+M=L.map('map',{center:[41.65,14.55],zoom:9});
+var st=document.getElementById('mSt');
+
+// Base layers
+var osm=L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OSM',maxZoom:19}).addTo(M);
+var topo=L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',{attribution:'© OpenTopoMap',maxZoom:17});
+var sat=L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{attribution:'© Esri',maxZoom:18});
+var bases={"OpenStreetMap":osm,"Topografica":topo,"Satellite":sat};
+var ov={};
+var LC=L.control.layers(bases,{},{collapsed:true}).addTo(M);
+
+// ─── ESRI/ARCGIS LAYERS (HTTPS!) from PCN ───
+// These use the ArcGIS REST API which supports HTTPS
+var PCN_ARC="https://www.pcn.minambiente.it/arcgis/rest/services/";
+
+try {
+  // Progetto Natura: Natura 2000 + EUAP (layers 0-6)
+  var natura=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/progetto_natura/MapServer",opacity:0.55,layers:[0,1,2,3,4]});
+  LC.addOverlay(natura,"🌿🏔️ Natura 2000 + Aree Protette");
+
+  // Vincoli (if available)
+  var vincoli=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/Vincoli/MapServer",opacity:0.5});
+  LC.addOverlay(vincoli,"🏛️ Vincoli Paesaggistici");
+
+  // Pericolosità PAI
+  var pai=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/PAI/MapServer",opacity:0.5});
+  LC.addOverlay(pai,"💧 PAI Pericolosità/Rischio");
+
+  // Classificazione sismica
+  var sism=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/Classificazione_sismica/MapServer",opacity:0.45});
+  LC.addOverlay(sism,"📊 Classificazione Sismica");
+
+  // Corine Land Cover
+  var clc=L.esri.dynamicMapLayer({url:PCN_ARC+"progetti/CLC/MapServer",opacity:0.4});
+  LC.addOverlay(clc,"🌾 Corine Land Cover");
+
+  st.textContent='✅ Layer ArcGIS PCN disponibili';
+} catch(e) {
+  st.textContent='⚠️ Layer PCN non disponibili: '+e.message;
+}
+
+// ─── ISPRA IFFI (ArcGIS HTTPS) ───
+try {
+  var iffi=L.esri.dynamicMapLayer({url:"https://www.geoservices.isprambiente.it/arcgis/rest/services/IFFI/Progetto_IFFI_WMS_public/MapServer",opacity:0.55});
+  LC.addOverlay(iffi,"🏚️ IFFI Frane (ISPRA)");
+} catch(e){}
+
+// ─── ISPRA Geologia (ArcGIS HTTPS) ───
+try {
+  var geo100=L.esri.dynamicMapLayer({url:"https://sgi2.isprambiente.it/arcgis/rest/services/servizi/carta_geologica100k/MapServer",opacity:0.45});
+  LC.addOverlay(geo100,"⛰️ Geologia 1:100k (ISPRA)");
+  var geo50=L.esri.dynamicMapLayer({url:"https://sgi2.isprambiente.it/arcgis/rest/services/servizi/carta_geologica50k/MapServer",opacity:0.45});
+  LC.addOverlay(geo50,"⛰️ Geologia CARG 1:50k");
+} catch(e){}
+
+// ─── WMS FALLBACK (HTTP — funziona solo da server locale) ───
+var P="http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/Vettoriali/";
+function w(u,l,o){return L.tileLayer.wms(u,Object.assign({format:'image/png',transparent:true,version:'1.1.1'},o||{},{layers:l}))}
+LC.addOverlay(w(P+"Reticolo_idrografico.map","Reticolo_idrografico",{opacity:.5}),"🌊 Reticolo Idrografico (HTTP)");
+LC.addOverlay(w(P+"Grafo_stradale.map","Grafo_stradale",{opacity:.5}),"🛣️ Grafo Stradale (HTTP)");
+LC.addOverlay(w(P+"Aree_percorse_dal_fuoco.map","Aree_percorse_dal_fuoco",{opacity:.5}),"🔥 Incendi (HTTP)");
+LC.addOverlay(w("http://wms.pcn.minambiente.it/ogc?map=/ms_ogc/WMS_v1.3/raster/ortofoto_colore_12.map","OI.ORTOIMMAGINI.2012",{opacity:.75}),"📷 Ortofoto 2012 (HTTP)");
+
+// ─── GEOJSON COMUNI da jsDelivr CDN (HTTPS + CORS) ───
+st.textContent='⏳ Caricamento 136 comuni ISTAT...';
+fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/geojson/limits_R_14_municipalities.geojson")
+.then(function(r){if(!r.ok)throw new Error(r.status);return r.json()})
+.then(function(data){
+  var ly=L.geoJSON(data,{
+    style:function(f){return{color:'#555',weight:.7,fillColor:f.properties.prov_name==='Campobasso'?'#a8dadc':'#e9c46a',fillOpacity:.12}},
+    onEachFeature:function(f,l){
+      var nm=f.properties.name||f.properties.com_name||'Comune';
+      l.bindPopup('<b>'+nm+'</b><br>Prov: '+(f.properties.prov_name||'')+'<br>ISTAT: '+(f.properties.com_istat_code||''));
+      l.on('mouseover',function(e){e.target.setStyle({fillOpacity:.4,weight:2})});
+      l.on('mouseout',function(e){ly.resetStyle(e.target)})}
+  }).addTo(M);
+  LC.addOverlay(ly,"🏘️ Comuni ISTAT ("+data.features.length+")");
+  M.fitBounds(ly.getBounds(),{padding:[20,20]});
+  st.textContent='✅ '+data.features.length+' comuni + layer ArcGIS caricati';
+  toast('✅ 136 comuni caricati — attiva layer dal pannello ☰');
+}).catch(function(e){st.textContent='⚠️ Comuni non caricati: '+e.message});
+
+// Province
+fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/geojson/limits_IT_provinces.geojson")
+.then(function(r){return r.json()}).then(function(d){
+  var prov=d.features.filter(function(f){return f.properties.prov_name==='Campobasso'||f.properties.prov_name==='Isernia'});
+  if(prov.length){var ly=L.geoJSON({type:"FeatureCollection",features:prov},{style:{color:'#1d3557',weight:2,fillOpacity:.02,dashArray:'6,3'},onEachFeature:function(f,l){l.bindPopup('<b>Prov. '+f.properties.prov_name+'</b>')}}).addTo(M);LC.addOverlay(ly,"📍 Province")}
+}).catch(function(){});
+
+// Regione
+fetch("https://cdn.jsdelivr.net/gh/openpolis/geojson-italy@master/geojson/limits_IT_regions.geojson")
+.then(function(r){return r.json()}).then(function(d){
+  var mol=d.features.filter(function(f){return f.properties.reg_name==='Molise'});
+  if(mol.length){var ly=L.geoJSON({type:"FeatureCollection",features:mol},{style:{color:'#1b4332',weight:3,fillOpacity:.03,dashArray:'10,5'}}).addTo(M);LC.addOverlay(ly,"🏔️ Confine Regione")}
+}).catch(function(){});
+
+// ─── STRADE ANAS ───
+var anas=[
+{id:"SS17",n:'SS 17 "Appennino Abruzzese"',d:"Conf.Abruzzo→Isernia→Bojano",ki:178,kf:235,c:"#d32f2f",w:4,p:[[41.87,14.10],[41.84,14.14],[41.80,14.16],[41.76,14.19],[41.72,14.20],[41.68,14.22],[41.64,14.23],[41.60,14.23],[41.56,14.28],[41.53,14.35],[41.50,14.40],[41.48,14.47]]},
+{id:"SS87",n:'SS 87 "Sannitica"',d:"Conf.Campania→CB→Termoli",ki:65,kf:175,c:"#d32f2f",w:4,p:[[41.42,14.72],[41.46,14.70],[41.50,14.68],[41.53,14.66],[41.56,14.66],[41.60,14.68],[41.65,14.72],[41.70,14.78],[41.76,14.84],[41.80,14.88],[41.85,14.92],[41.90,14.95],[41.95,14.98],[42.00,14.99]]},
+{id:"SS647",n:'SS 647 "Bifernina"',d:"Bojano→Termoli",ki:0,kf:58,c:"#d32f2f",w:4,p:[[41.48,14.47],[41.52,14.55],[41.55,14.60],[41.58,14.65],[41.62,14.70],[41.67,14.76],[41.72,14.82],[41.78,14.87],[41.84,14.91],[41.90,14.94],[41.96,14.98],[42.00,14.99]]},
+{id:"SS650",n:'SS 650 "F.V.Trigno"',d:"Conf.Abruzzo→S.Pietro Av.",ki:0,kf:68,c:"#c62828",w:3.5,p:[[41.95,14.78],[41.92,14.72],[41.90,14.65],[41.87,14.58],[41.85,14.50],[41.83,14.42],[41.82,14.34],[41.82,14.27]]},
+{id:"SS85",n:'SS 85 "Venafrana"',d:"Venafro→Isernia",ki:0,kf:20,c:"#c62828",w:3,p:[[41.48,14.05],[41.50,14.08],[41.52,14.12],[41.54,14.16],[41.57,14.20],[41.60,14.23]]},
+{id:"SS158",n:'SS 158 "V.Volturno"',d:"Isernia→Alfedena",ki:0,kf:38,c:"#c62828",w:3,p:[[41.60,14.23],[41.62,14.19],[41.64,14.15],[41.66,14.10],[41.68,14.06],[41.70,14.02]]},
+{id:"SS652",n:'SS 652 "F.V.Sangro"',d:"NW→Abruzzo",ki:0,kf:25,c:"#c62828",w:3,p:[[41.82,14.27],[41.84,14.22],[41.87,14.17],[41.89,14.13]]},
+{id:"SS711",n:'SS 711 Tang.CB',d:"Tangenziale",ki:0,kf:12,c:"#b71c1c",w:3,p:[[41.58,14.62],[41.57,14.65],[41.56,14.68],[41.55,14.72]]},
+{id:"SS751",n:'SS 751 "F.V.Rivolo"',d:"SS647→SS711",ki:0,kf:8,c:"#b71c1c",w:2.5,p:[[41.58,14.65],[41.60,14.68],[41.62,14.70]]},
+{id:"SS747",n:'SS 747 "Fossaltina"',d:"Trivento→Abruzzo",ki:0,kf:22,c:"#b71c1c",w:2.5,p:[[41.78,14.55],[41.80,14.52],[41.82,14.48],[41.84,14.44]]}
+];
+var aG=L.layerGroup();
+anas.forEach(function(s){var ln=L.polyline(s.p,{color:s.c,weight:s.w,opacity:.85});ln.bindPopup('<b>'+s.id+'</b> '+s.n+'<br><i>'+s.d+'</i><br>ANAS km'+s.ki+'→'+s.kf);ln.addTo(aG);
+[[0,s.ki],[s.p.length-1,s.kf]].forEach(function(x){L.marker(s.p[x[0]],{icon:L.divIcon({html:'<div style="background:#d32f2f;color:#fff;font-size:7px;font-weight:700;padding:1px 3px;border-radius:2px;white-space:nowrap;border:1px solid #fff">'+s.id+' km'+x[1]+'</div>',className:'',iconAnchor:[16,-3]})}).addTo(aG)})});
+aG.addTo(M);LC.addOverlay(aG,"🛣️ ANAS Statali");
+
+// ─── STRADE PROVINCIALI ───
+var sp=[
+{id:"SP51",n:"Sinarca",e:"Prov.CB",g:"Gr.8",p:[[41.95,14.90],[41.97,14.93],[42.00,14.96]]},
+{id:"SP78",n:"Larino-Montorio",e:"Prov.CB",g:"Gr.8",p:[[41.80,14.92],[41.78,14.88],[41.75,14.85]]},
+{id:"SP63",n:"Cerrosecco",e:"Prov.CB",g:"Gr.3",p:[[41.73,14.96],[41.70,14.92],[41.68,14.88]]},
+{id:"SP40",n:"Centocelle",e:"Prov.CB",g:"Gr.3",p:[[41.65,14.85],[41.63,14.88],[41.60,14.90]]},
+{id:"SP47",n:"Fossaltina",e:"Prov.CB",g:"Gr.7",p:[[41.70,14.60],[41.72,14.58],[41.74,14.55]]},
+{id:"SP41d",n:"Garibaldi",e:"Prov.CB",g:"Gr.3",p:[[41.55,14.62],[41.57,14.65],[41.59,14.68]]},
+{id:"SP73",n:"Trivento-S.Angelo",e:"Prov.CB",g:"Gr.7",p:[[41.78,14.55],[41.76,14.58],[41.73,14.62]]},
+{id:"SP15d",n:"Trignina",e:"Prov.CB",g:"Gr.7",p:[[41.84,14.44],[41.86,14.42],[41.88,14.40]]},
+{id:"SP92",n:"Roccavivara",e:"Prov.CB",g:"Gr.7",p:[[41.85,14.48],[41.87,14.50],[41.89,14.52]]},
+{id:"SP132",n:"Matrice-S.Giov.",e:"Prov.CB",g:"Gr.3",p:[[41.58,14.68],[41.56,14.72],[41.54,14.75]]},
+{id:"SP86",n:"Capracotta-SPietro",e:"Prov.IS",p:[[41.83,14.27],[41.85,14.24],[41.87,14.21]]},
+{id:"SP59",n:"Venafro-Pozzilli",e:"Prov.IS",p:[[41.48,14.05],[41.47,14.08],[41.46,14.12]]},
+{id:"SP62",n:"Isernia-Macchia",e:"Prov.IS",p:[[41.60,14.23],[41.61,14.21],[41.63,14.19]]},
+{id:"SP72",n:"Isernia-Pesche",e:"Prov.IS",p:[[41.60,14.23],[41.61,14.26],[41.62,14.28]]}
+];
+var sG=L.layerGroup();sp.forEach(function(s){var c=s.e.indexOf('IS')>=0?'#0d47a1':'#1565c0';L.polyline(s.p,{color:c,weight:2.5,opacity:.7,dashArray:'8,4'}).bindPopup('<b>'+s.id+'</b> '+s.n+'<br>'+s.e+(s.g?' ('+s.g+')':'')).addTo(sG)});
+LC.addOverlay(sG,"🛤️ Provinciali CB/IS");
+
+// Centri
+var ct=[{n:"Campobasso",la:41.5603,lo:14.6627,m:1},{n:"Isernia",la:41.5961,lo:14.2328,m:1},{n:"Termoli",la:42.0025,lo:14.9942},{n:"Bojano",la:41.4833,lo:14.4667},{n:"Larino",la:41.80,lo:14.917},{n:"Venafro",la:41.4833,lo:14.05},{n:"Agnone",la:41.817,lo:14.367},{n:"Trivento",la:41.783,lo:14.55}];
+var cG=L.layerGroup();ct.forEach(function(c){var ic=c.m?L.divIcon({html:'<div style="background:#c62828;width:11px;height:11px;border-radius:50%;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)"></div>',iconSize:[11,11],className:''}):L.divIcon({html:'<div style="background:#fff;width:7px;height:7px;border-radius:50%;border:1.5px solid #555"></div>',iconSize:[7,7],className:''});L.marker([c.la,c.lo],{icon:ic}).bindTooltip(c.n,{permanent:!!c.m,direction:'right',offset:[6,0]}).addTo(cG)});
+cG.addTo(M);LC.addOverlay(cG,"🏙️ Centri");
+L.control.scale({imperial:false}).addTo(M);
+}
+
+render();
+</script>
+</body>
+</html>
